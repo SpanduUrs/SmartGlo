@@ -470,7 +470,7 @@
     </div>
     <div class="notifications-panel" id="notifications-panel">
       <h4 style="margin:10px; color:#16213e;">Notifications</h4>
-      <ul id="notification-list"> <a href="http://192.168.4.1">Atert Notification</a></ul>                                     //<li>No new alerts</li>
+      <ul id="notification-list"> <a href="">Atert Notification</a></ul>                                     //<li>No new alerts</li>
       <div id="alertBox" style="background:#1c2541; padding:1rem; margin:10px; border-radius:12px; display:none;">
         <p><strong>Device:</strong> <span id="device">---</span></p>
         <p><strong>Time:</strong> <span id="time">---</span></p>
@@ -560,7 +560,7 @@
         <tr><td>2025-09-18 15:45</td><td>2nd Avenue</td><td>Accident</td><td>In Progress</td><td>High</td></tr>
       </tbody></table>`,
     map:`<h1>Live Map</h1>
-      <iframe width="100%" height="400" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDLwuMaLAT3EHAekaEmdvcYNYy_HAV26pY&q=Bangalore" allowfullscreen></iframe>`,
+      <iframe width="100%" height="400" src="https://www.google.com/maps/embed/v1/place?key=" allowfullscreen></iframe>`,
     communications:`<h1>Communications</h1>
       <ul>
         <li>09:30 - ⚠️ New incident reported at Main Street</li>
@@ -595,25 +595,14 @@
 
   liveMapText.addEventListener("click", ()=>loadLiveMap());
 
-  // --- Real-time socket placeholders ---
-  // const sosSocket = io('http://localhost:5000'); // SOS alerts
-  // sosSocket.on('alert', data=>{
-  //   addNotification(`🚨 SOS from ${data.device||'Device'}`, data);
-  // });
 
-  // const socket = io('http://localhost:5000'); // Admin alerts
-  // socket.on('connect', ()=>console.log("WebSocket connected..."));
-  // socket.on('new_alert', message=>addNotification(`🚨 ALERT: ${message}`));
-  // socket.on('disconnect', ()=>console.log("WebSocket disconnected"));
-  // --- Single Socket.IO connection ---
 
-const sosSocket = io('http://192.168.43.177:5000')//('http://localhost:5000'); // SOS alerts  
-const socket = io('http://192.168.43.177:5000')//('http://localhost:5000');  // Admin alerts
+const sosSocket = io('') 
+const socket = io('')
 sosSocket.on('connect', ()=>console.log("✅ sosSocket connected"));
 socket.on('connect', ()=>console.log("✅ socket connected"));
 
-// SOS alert
-// sosSocket.on('alert', data => addNotification(`🚨 SOS from ${data.device || 'Device'}`, data));
+
 sosSocket.on('sosAlert', data => {
   console.log("🚨 ALERT RECEIVED", data);
   addNotification(`🚨 SOS from ${data.device || 'Unknown Device'}`, data);
@@ -624,10 +613,7 @@ socket.on('new_alert', device => addNotification(`🚨 ALERT from ${device || 'D
 
 socket.on('disconnect', ()=>console.log("Socket disconnected"));
 sosSocket.on('disconnect', ()=>console.log("sosSocket disconnected"));
-// socket.on('connect', ()=>console.log("WebSocket connected..."));
-// socket.on('alert', data=>addNotification(`🚨 SOS from ${data.device||'Device'}`, data));
-// socket.on('new_alert', message=>addNotification(`🚨 ALERT: ${message}`));
-// socket.on('disconnect', ()=>console.log("WebSocket disconnected"));
+
 
 var audio = new Audio("assets/beep-07.mp3");
    function playBeep() {
@@ -637,3 +623,4 @@ var audio = new Audio("assets/beep-07.mp3");
 </script>
 </body>
 </html>
+
