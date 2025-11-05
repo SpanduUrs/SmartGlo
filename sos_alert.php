@@ -7,7 +7,7 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *"); 
 
 // Simple API key check (make sure ESP adds this in header)
-$EXPECTED_API_KEY = "AIzaSyDLwuMaLAT3EHAekaEmdvcYNYy_HAV26pY";
+$EXPECTED_API_KEY = "API_KEY";
 $provided_key = $_SERVER['HTTP_X_API_KEY'] ?? '';
 if ($provided_key !== $EXPECTED_API_KEY) {
     http_response_code(401);
@@ -17,9 +17,9 @@ if ($provided_key !== $EXPECTED_API_KEY) {
 
 // DB config
 $dbHost = 'localhost';
-$dbName = 'smartglo';
-$dbUser = 'smartglo_user';
-$dbPass = 'urs@123456789'; 
+$dbName = 'db_name';
+$dbUser = 'user_name';
+$dbPass = 'password'; 
 
 $body = file_get_contents("php://input");
 $data = json_decode($body, true);
@@ -65,7 +65,7 @@ try {
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
-        'x-api-key: AIzaSyDLwuMaLAT3EHAekaEmdvcYNYy_HAV26pY'
+        'x-api-key: API_KEY'
     ]);
     curl_setopt($ch, CURLOPT_TIMEOUT, 2);
     $resp = curl_exec($ch);
@@ -77,3 +77,4 @@ try {
     http_response_code(500);
     echo json_encode(["status"=>"error","message"=>$e->getMessage()]);
 }
+
