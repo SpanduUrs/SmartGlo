@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ALERTIFY</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <style>
+    /* RESET + BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at center, #0a0a1a 0%, #02010a 100%);
+      color: #e0e8ff;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* =============== BACKGROUND ANIMATION =============== */
+    .background {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.15), transparent 70%);
+      animation: waveMove 10s infinite linear;
+      border-radius: 50%;
+    }
+    .wave:nth-child(1) {
+      top: -50%;
+      left: -50%;
+      animation-delay: 0s;
+    }
+    .wave:nth-child(2) {
+      top: -60%;
+      left: -40%;
+      animation-delay: 3s;
+    }
+    .wave:nth-child(3) {
+      top: -40%;
+      left: -60%;
+      animation-delay: 6s;
+    }
+
+    @keyframes waveMove {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    /* =============== NAVBAR =============== */
+    .navbar {
+      height: 60px;
+      background: rgba(10, 15, 40, 0.8);
+      border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      backdrop-filter: blur(10px);
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(10, 15, 40, 0.8);;
+    }
+
+    .logo {
+      color: #00ffff;
+      font-size: 22px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .profile {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar-circle {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      border: 2px solid #00ffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #000;
+      background: linear-gradient(145deg, #00ffff, #007bff);
+      box-shadow: 0 0 12px #00ffff;
+    }
+
+    /* =============== HAMBURGER =============== */
+    .hamburger {
+      width: 25px;
+      height: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      margin-right: 15px;
+    }
+    .hamburger span {
+      height: 3px;
+      background: #00ffff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .hamburger:hover span { background: #fff; }
+
+    /* =============== SIDEBAR =============== */
+    .sidebar {
+      width: 240px;
+      background: rgba(5, 10, 25, 0.85);
+      position: fixed;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      padding-top: 20px;
+      transform: translateX(-240px);
+      transition: 0.3s ease;
+      border-right: 1px solid rgba(0, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      z-index: 4;
+    }
+    .sidebar.show { transform: translateX(0); }
+    .sidebar h3 {
+      color: #00ffff;
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+    }
+    .sidebar ul li a {
+      text-decoration: none;
+      color: #e0e8ff;
+      font-weight: 500;
+      transition: 0.3s;
+      display: block;
+    }
+    .sidebar ul li:hover {
+      background: rgba(0, 255, 255, 0.1);
+    }
+    .sidebar ul li a:hover {
+      color: #00ffff;
+      text-shadow: 0 0 5px #00ffff;
+    }
+
+    /* =============== CONTENT AREA =============== */
+    .content {
+      flex: 1;
+      padding: 20px;
+      margin-top: 60px;
+      transition: margin-left 0.3s;
+      overflow-y: auto;
+      z-index: 2;
+      position: relative;
+    }
+    .sidebar.show ~ .content { margin-left: 240px; }
+
+    h1 {
+      color: #00ffff;
+      margin-bottom: 20px;
+      text-shadow: none; /* No glow here */
+    }
+
+    /* Home Page Text Styling */
+.home-intro {
+  margin-top: 30px;
+  max-width: 800px;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #cfefff;
+  background: rgba(10, 20, 40, 0.6);
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s ease;
+}
+
+.home-intro:hover {
+  transform: translateY(-5px);
+}
+
+.home-intro h2 {
+  color: #00ffff;
+  font-size: 1.4rem;
+  margin-top: 25px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+.home-intro .highlight {
+  color: #00ffff;
+  font-weight: 600;
+}
+
+    /* =============== CARDS =============== */
+    .card {
+      background: rgba(10, 15, 40, 0.7);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 10px;
+      width: 220px;
+      display: inline-block;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+      transition: all 0.4s;
+      backdrop-filter: blur(8px);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: #00ffff;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+
+    /* =============== TABLES =============== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(10, 15, 40, 0.8);
+      color: #e0e8ff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+    }
+    th, td {
+      padding: 10px 15px;
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      text-align: left;
+    }
+    th {
+      background: linear-gradient(135deg, #007bff, #00ffff);
+      color: #000;
+    }
+
+    /* =============== BUTTONS =============== */
+    button {
+      background: linear-gradient(135deg, #00ffff, #007bff);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+    button:hover {
+      background: linear-gradient(135deg, #33ffff, #3399ff);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+    }
+
+    /* =============== NOTIFICATIONS =============== */
+    .notifications {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(10, 15, 40, 0.8);
+      color: #00ffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+      z-index: 3;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+    .notifications:hover { background: rgba(0, 255, 255, 0.1); }
+
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff3b3b;
+      color: white;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 50%;
+      display: none;
+    }
+
+    .notifications-panel {
+      position: fixed;
+      bottom: 60px;
+      left: 10px;
+      width: 260px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+      display: none;
+      max-height: 220px;
+      overflow-y: auto;
+      font-size: 14px;
+      z-index: 10;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* =============== TOAST =============== */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #007bff, #00ffff);
+      color: #000;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      display: none;
+      z-index: 9999;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+      animation: fadein 0.5s, fadeout 0.5s 3s;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeout {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    /* Floating Buttons */
+    /* .help-desk, .live-map-text {
+      background: rgba(10, 15, 40, 0.8);
+      color: #00ffff;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    } */
+
+    .help-desk {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(10, 15, 40, 0.8);
+      color: #00ffff;
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      z-index: 3;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+    .help-desk:hover {
+      background: rgba(0, 255, 255, 0.1);
+    }
+    
+    /* .help-desk:hover, .live-map-text:hover {
+      background: rgba(0, 255, 255, 0.1);
+      transform: scale(1.05);
+    } */
+
+    .live-map-text {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 15, 40, 0.8);
+      color: #00ffff;
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      z-index: 3;
+      box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+    .live-map-text:hover {
+      background:rgba(0, 255, 255, 0.1) ;
+    }
+    
+
+    @media (max-width: 768px) {
+    .sidebar { transform:translateX(-240px); } 
+    .sidebar.show ~ .content { margin-left:0; } 
+    }
+  </style>
+
+
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="background">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+  </div>
+
+  <div class="navbar">
+    <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <div class="logo">Alertify</div>
+    <div class="profile">
+      <span id="user-name"></span>
+      <div id="avatar" class="avatar-circle">?</div>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <h3>Dashboard</h3>
+    <ul>
+      <li><a href="#" data-section="overview">Overview</a></li>
+      <li><a href="#" data-section="incidents">Incidents</a></li>
+      <li><a href="#" data-section="map">Live Map</a></li>
+      <li><a href="#" data-section="communications">Communications</a></li>
+      <li><a href="#" data-section="records">Records</a></li>
+      <li><a href="#" data-section="admin">Admin</a></li>
+    </ul>
+  </div>
+
+  <div class="content" id="content">
+    <h1>Welcome to the Alertify Portal</h1>
+  <!-- Home Page Introduction Section -->
+<div class="home-intro">
+  <p>
+    Welcome to <span class="highlight">SmartGlo</span>, an innovative step toward
+    <span class="highlight">smarter, safer, and more sustainable cities.</span>
+    In today’s rapidly growing urban environments, streetlights are no longer just about illumination — 
+    they are the <span class="highlight">first line of safety and awareness.</span>
+  </p>
+
+  <h2>Our Vision</h2>
+  <p>
+    To build a <span class="highlight">connected, eco-friendly, and safety-oriented</span> streetlight infrastructure 
+    that aligns with <span class="highlight">Smart City initiatives</span>, enhancing urban safety while reducing energy consumption.
+  </p>
+
+
+</div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="bottom-bar">
+    <div class="notifications" id="notifications">
+      🔔 Notifications
+      <span class="badge" id="badge">0</span>
+    </div>
+    <div class="notifications-panel" id="notifications-panel">
+      <h4 style="margin:10px; color:#16213e;">Notifications</h4>
+      <ul id="notification-list"> <a href="http://192.168.4.1">Atert Notification</a></ul>                                     //<li>No new alerts</li>
+      <div id="alertBox" style="background:#1c2541; padding:1rem; margin:10px; border-radius:12px; display:none;">
+        <p><strong>Device:</strong> <span id="device">---</span></p>
+        <p><strong>Time:</strong> <span id="time">---</span></p>
+        <p><strong>Latitude:</strong> <span id="lat">---</span></p>
+        <p><strong>Longitude:</strong> <span id="lon">---</span></p>
+        <iframe id="map" src="" style="width:100%; height:200px; border-radius:8px; margin-top:8px;" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="live-map-text" id="live-map-text">📍Live Map</div>
+    <div class="help-desk" onclick="alert('Help Desk: Contact support@emergency.com')">💬 Help Desk</div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <audio id="alertSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+
+<script>
+  const sidebar = document.getElementById("sidebar");
+  const hamburger = document.getElementById("hamburger");
+  const content = document.getElementById("content");
+  const notifications = document.getElementById("notifications");
+  const notificationsPanel = document.getElementById("notifications-panel");
+  const badge = document.getElementById("badge");
+  const toast = document.getElementById("toast");
+  const avatarDiv = document.getElementById("avatar");
+  const liveMapText = document.getElementById("live-map-text");
+
+  // Sidebar toggle
+  hamburger.addEventListener("click", () => { sidebar.classList.toggle("show"); });
+
+  // User avatar from localStorage
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  if (loggedInUser) avatarDiv.textContent = loggedInUser.charAt(0).toUpperCase();
+
+  // Toast function
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.style.display = "block";
+    setTimeout(()=>toast.style.display="none",3500);
+  }
+
+  // Notification count
+  let count = 0;
+  function addNotification(message, data){
+    const notificationList = document.getElementById("notification-list");
+    if(notificationList.children[0].textContent==="No new alerts") notificationList.innerHTML="";
+    const li = document.createElement("li");
+    li.textContent = message;
+    notificationList.prepend(li);
+
+    badge.textContent = ++count;
+    badge.style.display = "inline-block";
+    showToast(message);
+    document.getElementById('alertSound').play();
+
+    if(data){
+      document.getElementById('alertBox').style.display='block';
+      document.getElementById('device').textContent=data.device||'Device';
+      document.getElementById('time').textContent=data.time||new Date().toLocaleString();
+      document.getElementById('lat').textContent=data.lat||'---';
+      document.getElementById('lon').textContent=data.lon||'---';
+      if(data.lat && data.lon && data.lat!="0.0"){
+        document.getElementById('map').src="https://maps.google.com/maps?q=${data.lat},${data.lon}&z=15&output=embed";
+        loadLiveMap(data.lat, data.lon);
+      }
+    }
+  }
+
+  // Notifications panel toggle
+  notifications.addEventListener("click", ()=>{
+    const isVisible = notificationsPanel.style.display==="block";
+    notificationsPanel.style.display = isVisible?"none":"block";
+    if(!isVisible){ badge.style.display="none"; badge.textContent="0"; }
+  });
+
+  // Sections
+  const sections = {
+    overview:`<h1>Overview</h1>
+      <div class="card"><h3>Total Devices</h3><p>120</p></div>
+      <div class="card"><h3>Active Devices</h3><p>115</p></div>
+      <div class="card"><h3>Recent Alerts</h3><p>3</p></div>
+      <div class="card"><h3>Energy Saved</h3><p>450 kWh</p></div>`,
+    incidents:`<h1>Incidents</h1>
+      <table><thead><tr><th>Time</th><th>Location</th><th>Type</th><th>Status</th><th>Priority</th></tr></thead>
+      <tbody>
+        <tr><td>2025-09-18 16:30</td><td>Main Street</td><td>Power Failure</td><td>Resolved</td><td>Medium</td></tr>
+        <tr><td>2025-09-18 15:45</td><td>2nd Avenue</td><td>Accident</td><td>In Progress</td><td>High</td></tr>
+      </tbody></table>`,
+    map:`<h1>Live Map</h1>
+      <iframe width="100%" height="400" src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDLwuMaLAT3EHAekaEmdvcYNYy_HAV26pY&q=Bangalore" allowfullscreen></iframe>`,
+    communications:`<h1>Communications</h1>
+      <ul>
+        <li>09:30 - ⚠️ New incident reported at Main Street</li>
+        <li>10:15 - 🛠️ Maintenance scheduled at 2nd Avenue</li>
+      </ul>`,
+    records:`<h1>Records</h1>
+      <table><thead><tr><th>Date</th><th>Incident</th><th>Location</th><th>Action Taken</th></tr></thead>
+      <tbody>
+        <tr><td>2025-09-17</td><td>Power Failure</td><td>Main Street</td><td>Repaired</td></tr>
+        <tr><td>2025-09-16</td><td>Streetlight Malfunction</td><td>3rd Avenue</td><td>Replaced Lamp</td></tr>
+      </tbody></table>`,
+    admin:`<h1>Admin</h1>
+      <div class="card"><h3>Manage Devices</h3><button>Open</button></div>
+      <div class="card"><h3>Manage Users</h3><button>Open</button></div>
+      <div class="card"><h3>System Settings</h3><button>Open</button></div>`
+  };
+
+  document.querySelectorAll(".sidebar a").forEach(link=>{
+    link.addEventListener("click", e=>{
+      e.preventDefault();
+      const section = link.dataset.section;
+      content.innerHTML = sections[section]||"<h1>Not Found</h1>";
+      sidebar.classList.remove("show");
+      window.scrollTo(0,0);
+    });
+  });
+
+  function loadLiveMap(lat, lon){
+    content.innerHTML = `<h1>Live Map</h1>
+      <iframe width="100%" height="400" frameborder="0" src="https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed" allowfullscreen></iframe>`;
+  }
+
+  liveMapText.addEventListener("click", ()=>loadLiveMap());
+
+  // --- Real-time socket placeholders ---
+  // const sosSocket = io('http://localhost:5000'); // SOS alerts
+  // sosSocket.on('alert', data=>{
+  //   addNotification(`🚨 SOS from ${data.device||'Device'}`, data);
+  // });
+
+  // const socket = io('http://localhost:5000'); // Admin alerts
+  // socket.on('connect', ()=>console.log("WebSocket connected..."));
+  // socket.on('new_alert', message=>addNotification(`🚨 ALERT: ${message}`));
+  // socket.on('disconnect', ()=>console.log("WebSocket disconnected"));
+  // --- Single Socket.IO connection ---
+
+const sosSocket = io('http://192.168.43.177:5000')//('http://localhost:5000'); // SOS alerts  
+const socket = io('http://192.168.43.177:5000')//('http://localhost:5000');  // Admin alerts
+sosSocket.on('connect', ()=>console.log("✅ sosSocket connected"));
+socket.on('connect', ()=>console.log("✅ socket connected"));
+
+// SOS alert
+// sosSocket.on('alert', data => addNotification(`🚨 SOS from ${data.device || 'Device'}`, data));
+sosSocket.on('sosAlert', data => {
+  console.log("🚨 ALERT RECEIVED", data);
+  addNotification(`🚨 SOS from ${data.device || 'Unknown Device'}`, data);
+});
+
+// Admin alert
+socket.on('new_alert', device => addNotification(`🚨 ALERT from ${device || 'Device'}`));
+
+socket.on('disconnect', ()=>console.log("Socket disconnected"));
+sosSocket.on('disconnect', ()=>console.log("sosSocket disconnected"));
+// socket.on('connect', ()=>console.log("WebSocket connected..."));
+// socket.on('alert', data=>addNotification(`🚨 SOS from ${data.device||'Device'}`, data));
+// socket.on('new_alert', message=>addNotification(`🚨 ALERT: ${message}`));
+// socket.on('disconnect', ()=>console.log("WebSocket disconnected"));
+
+var audio = new Audio("assets/beep-07.mp3");
+   function playBeep() {
+       audio.play();
+   }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --glow: #00eaff;
+  --bg1: #010b13;
+  --bg2: #021e33;
+  --wave1: rgba(0, 238, 255, 0.15);
+  --wave2: rgba(0, 255, 204, 0.1);
+  --wave3: rgba(0, 180, 255, 0.08);
+  --text: #dffcff;
+}
+
+/* BASE BODY */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+  background: radial-gradient(circle at top left, var(--bg1), var(--bg2));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* BACKGROUND ANIMATION */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -10;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: 250px;
+  opacity: 0.8;
+  animation: waveFlow 14s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+}
+
+.wave:nth-child(1) {
+  background: radial-gradient(circle at 30% 80%, var(--wave1), transparent 70%);
+  animation-duration: 20s;
+}
+
+.wave:nth-child(2) {
+  background: radial-gradient(circle at 70% 100%, var(--wave2), transparent 70%);
+  animation-duration: 15s;
+  animation-direction: reverse;
+}
+
+.wave:nth-child(3) {
+  background: radial-gradient(circle at 50% 90%, var(--wave3), transparent 70%);
+  animation-duration: 25s;
+}
+
+@keyframes waveFlow {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(-25%) translateY(15px); }
+  100% { transform: translateX(0) translateY(0); }
+}
+
+/* === LOGIN BOX === */
+section {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-box {
+  background: rgba(0, 20, 40, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0,255,255,0.2);
+  border-radius: 20px;
+  width: 480px;
+  padding: 50px 40px;
+  box-shadow: 0 0 25px rgba(0,255,255,0.2);
+  text-align: center;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  color: var(--glow);
+  font-size: 2.2em;
+  letter-spacing: 2px;
+  text-shadow: 0 0 15px var(--glow);
+  margin-bottom: 20px;
+}
+
+/* INPUT BOXES */
+.input-box {
+  position: relative;
+  margin: 30px 0;
+  border-bottom: 2px solid rgba(0,255,255,0.3);
+}
+
+.input-box label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  font-size: 1em;
+  color: #b3eaff;
+  pointer-events: none;
+  transition: 0.4s;
+}
+
+.input-box input {
+  width: 100%;
+  height: 50px;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: #fff;
+  padding: 0 35px 0 5px;
+  font-size: 1em;
+}
+
+.input-box input:focus~label,
+.input-box input:valid~label {
+  top: -8px;
+  font-size: 0.9em;
+  color: var(--glow);
+}
+
+.input-box .icon {
+  position: absolute;
+  right: 8px;
+  color: var(--glow);
+  font-size: 1.3em;
+  line-height: 57px;
+}
+
+/* REMEMBER & FORGOT */
+.remember-forgot {
+  margin: -10px 0 20px;
+  font-size: 0.9em;
+  color: #b3eaff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.remember-forgot a {
+  color: var(--glow);
+  text-decoration: none;
+}
+
+.remember-forgot a:hover {
+  text-decoration: underline;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  height: 45px;
+  border: 2px solid var(--glow);
+  background: transparent;
+  color: var(--glow);
+  font-weight: 600;
+  border-radius: 50px;
+  font-family: 'Orbitron', sans-serif;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: var(--glow);
+  color: #00111f;
+  box-shadow: 0 0 25px var(--glow);
+  transform: translateY(-3px);
+}
+
+/* REGISTER BOX */
+.register-box {
+  background: rgba(0, 20, 40, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,255,255,0.2);
+  border-radius: 20px;
+  width: 400px;
+  padding: 50px 40px;
+  box-shadow: 0 0 25px rgba(0,255,255,0.2);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation: fadeIn 1.2s ease-in-out;
+}
+
+.register-link {
+  color: #b3eaff;
+  margin-top: 25px;
+}
+
+.register-link a {
+  color: var(--glow);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .login-box, .register-box {
+    width: 90%;
+    padding: 30px 25px;
+  }
+}
