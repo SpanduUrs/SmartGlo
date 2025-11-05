@@ -25,9 +25,9 @@ const io = socketio(server, { cors: { origin: "*" } });
 // ---------- MySQL Connection ----------
 const db = mysql.createConnection({
   host: "localhost",
-  user: "smartglo_user",
-  password: "urs@123456789",
-  database: "smartglo_db"
+  user: "user_name",
+  password: "password",
+  database: "db"
 });
 
 db.connect(err => {
@@ -36,7 +36,7 @@ db.connect(err => {
 });
 
 // ---------- API Key ----------
-const SERVER_API_KEY = "AIzaSyDLwuMaLAT3EHAekaEmdvcYNYy_HAV26pY";
+const SERVER_API_KEY = "API_KEY";
 
 // ======================= ROUTES =============================(new lines....)
 // Serve index.html for home page
@@ -182,3 +182,4 @@ SerialPort.list().then(ports => {
 // ======================= START SERVER ==========================
 const PORT = 5000;
 server.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+
